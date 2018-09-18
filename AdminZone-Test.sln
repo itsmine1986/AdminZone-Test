@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2026
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "AdminZone-Test", "AdminZone-Test\AdminZone-Test.deployproj", "{466481C6-1A3A-4B0B-8270-2B753CF2D8EB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{466481C6-1A3A-4B0B-8270-2B753CF2D8EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{466481C6-1A3A-4B0B-8270-2B753CF2D8EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{466481C6-1A3A-4B0B-8270-2B753CF2D8EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{466481C6-1A3A-4B0B-8270-2B753CF2D8EB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E597D454-E781-4B50-AC6A-E40D9F8D3322}
+	EndGlobalSection
+EndGlobal
