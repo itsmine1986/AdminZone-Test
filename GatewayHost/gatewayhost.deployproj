@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>466481c6-1a3a-4b0b-8270-2b753cf2d8eb</ProjectGuid>
+    <ProjectGuid>3a9eacab-1749-432f-b694-78f411767c43</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup>
     <PrepareForBuildDependsOn>
@@ -25,10 +25,13 @@
   <ItemGroup>
     <Content Include="azuredeploy.parameters.json" />
     <Content Include="azuredeploy.json" />
-    <Content Include="Deploy-AzureResourceGroup.ps1" />
+    <Content Include="Configuration.zip" />
     <None Include="Deployment.targets">
       <Visible>False</Visible>
     </None>
+    <Content Include="Deploy-AzureResourceGroup.ps1" />
+    <Content Include="Scripts\WebAndGwFarmAdd_PostConfig1.1.ps1" />
+    <Content Include="README.md" />
   </ItemGroup>
   <Target Name="GetReferenceAssemblyPaths" />
 </Project>

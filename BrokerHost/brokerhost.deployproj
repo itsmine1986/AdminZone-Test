@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>466481c6-1a3a-4b0b-8270-2b753cf2d8eb</ProjectGuid>
+    <ProjectGuid>15d7d6f9-bdaf-4ef2-9de6-88a59cee4198</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup>
     <PrepareForBuildDependsOn>
@@ -25,10 +25,13 @@
   <ItemGroup>
     <Content Include="azuredeploy.parameters.json" />
     <Content Include="azuredeploy.json" />
-    <Content Include="Deploy-AzureResourceGroup.ps1" />
     <None Include="Deployment.targets">
       <Visible>False</Visible>
     </None>
+    <Content Include="Deploy-AzureResourceGroup.ps1" />
+    <Content Include="Scripts\RdcbHaPostConfig.ps1" />
+    <Content Include="README.md" />
+    <Content Include="DSC\Configuration.zip" />
   </ItemGroup>
   <Target Name="GetReferenceAssemblyPaths" />
 </Project>
