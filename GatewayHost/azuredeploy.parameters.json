@@ -3,25 +3,49 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "dnsLabelPrefix": {
-      "value": null
+      "value": "adaprds"
     },
     "adDomainName": {
-      "value": null
+      "value": "adm.scalesquad.io"
     },
     "adminUsername": {
-      "value": null
+      "value": "ssubramanian"
     },
     "brokerServer": {
-      "value": null
+      "value": "VmWSBpamA03"
     },
     "WebURL": {
-      "value": null
+      "value": "VmWSBpamA01.adm.scalesquad.io"
     },
     "domainNetbios": {
-      "value": null
+      "value": "adm"
     },
-    "storageAccountName": {
-      "value": null
+    //"storageAccountName": {
+    //  "value": ""
+    //},
+    "loadBalancer": {
+      "value": "LbISBpamA01"
+    },
+    "gw-AvailabilitySet": {
+      "value": "AsSBpamA01"
+    },
+    "adminPassword": {
+      "value": "s@nth0sh12345"
+    },
+    "adVnetRG": {
+      "value": "RgAdminZone"
+    },
+    "adVnetName": {
+      "value": "VnAdminZone"
+    },
+    "adSubnetName": {
+      "value": "default"
+    },
+    "rdsSubnetName": {
+      "value": "RDSSubnet"
+    },
+    "vmPrefix": {
+      "value": "VmWSBpamA"
     }
   }
 }

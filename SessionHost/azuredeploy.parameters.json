@@ -2,8 +2,47 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "dnsLabelPrefix": {
-      "value": null
+    "adDomainName": {
+      "value": "adm.scalesquad.io"
+    },
+    "adVnetRG": {
+      "value": "RgAdminZone"
+    },
+    "adVnetName": {
+      "value": "VnAdminZone"
+    },
+    "adSubnetName": {
+      "value": "default"
+    },
+    "rdsSubnetName": {
+      "value": "RDSSubnet"
+    },
+    "adminUsername": {
+      "value": "ejaganathan"
+    },
+    "adminPassword": {
+      "value": "S@iy@nKing2116"
+    },
+    "numberOfBrokerInstances": {
+      "value": 1
+    },
+    "numberOfRdshInstances": {
+      "value": 2
+    },
+    "dnsServerPrivateIp": {
+      "value": "10.40.0.4"
+    },
+    "vmPrefix": {
+      "value": "VmWSBpamA"
+    },
+    "vmCreationIndex": {
+      "value": 0
+    },
+    "availabilitySetPrefix": {
+      "value": "AsSBpamA"
+    },
+    "gatewayLoadbalancerName": {
+      "value": "LbISBpamA01"
     }
   }
 }

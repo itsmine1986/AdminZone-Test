@@ -26,6 +26,7 @@
     <Content Include="azuredeploy.parameters.json" />
     <Content Include="azuredeploy.json" />
     <Content Include="Configuration.zip" />
+    <Content Include="CustomScripts\cb-vm2.ps1" />
     <None Include="Deployment.targets">
       <Visible>False</Visible>
     </None>

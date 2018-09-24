@@ -49,7 +49,7 @@
     },
     "numberOfWebGwInstances": {
       "type": "int",
-      "defaultValue": 2,
+      "defaultValue": 1,
       "metadata": {
         "description": "Number of RD Gateway instances"
       }
@@ -96,48 +96,75 @@
         "description": "Size for the new RD Gateway VMs"
       }
     },
-    "existingVnet": {
-      "type": "string",
+    "adVnetRG": {
+      "defaultValue": "AD-VNET-RG",
+      "type": "String",
+      "metadata": {
+        "description": "The Resource Group containing the existing Virtual Network resource"
+      }
+    },
+    "adVnetName": {
+      "defaultValue": "[concat('ADVNET',resourceGroup().name)]",
+      "type": "String",
       "metadata": {
         "description": "The vnet name of AD domain. For example johnvnet1"
-      },
-      "defaultValue": "vnet"
+      }
     },
-    "existingSubnet": {
-      "type": "string",
+    "adSubnetName": {
+      "defaultValue": "[concat('ADStaticSubnet',resourceGroup().name)]",
+      "type": "String",
       "metadata": {
         "description": "The subnet name of AD domain. For example johnsubnet1"
-      },
-      "defaultValue": "Subnet"
+      }
+    },
+    "rdsSubnetName": {
+      "defaultValue": "AD-VNET-SUBNET",
+      "type": "String",
+      "metadata": {
+        "description": "The subnet name of AD domain. For example johnsubnet1"
+      }
+    },
+    "vmPrefix": {
+      "type": "string"
     }
   },
   "variables": {
     "imagePublisher": "MicrosoftWindowsServer",
     "imageOffer": "WindowsServer",
-    "vnetAddressRange": "10.0.0.0/16",
-    "subnetAddressRange": "10.0.0.0/24",
-    "dnsServerPrivateIp": "10.0.0.8",
-    "subnet-id": "[concat(resourceId('Microsoft.Network/virtualNetworks',parameters('existingVnet')),'/subnets/',parameters('existingSubnet'))]",
-    "publicIpRef": "publicIp",
+    "vnetAddressRange": "10.40.0.0/16",
+    "subnetAddressRange": "10.40.0.0/24",
+    "dnsServerPrivateIp": "10.40.0.4",
+    "subnet-id": "[concat(resourceId(parameters('adVnetRG'),'Microsoft.Network/virtualNetworks',parameters('adVnetName')),'/subnets/',parameters('rdsSubnetName'))]",
+    "publicIpRef": "PiPEu2AddS",
     "assetLocation": "https://raw.githubusercontent.com/Azure/AzureStack-QuickStart-Templates/master/rds-deployment",
-    "apiVersion": "2015-06-15",
-    "PublicIPLocation": "[concat(parameters('dnsLabelPrefix'),'.','[resourceGroup().location]','.cloudapp.azure.com')]"
+    "vmAPI": "2017-03-30",
+    "PublicIPLocation": "[concat(parameters('dnsLabelPrefix'),'.','[resourceGroup().location]','.cloudapp.azure.com')]",
+    "gatewayIndex": 2
   },
   "resources": [
-    {
-      "apiVersion": "2015-06-15",
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[parameters('storageAccountName')]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "accountType": "Standard_LRS"
-      }
-    },
-    {
-      "apiVersion": "2015-06-15",
+    //{
+    //  "apiVersion": "2015-06-15",
+    //  "type": "Microsoft.Storage/storageAccounts",
+    //  "name": "[parameters('storageAccountName')]",
+    //  "location": "[resourceGroup().location]",
+    //  "properties": {
+    //    "accountType": "Standard_LRS"
+    // }
+    //},
+      {
       "type": "Microsoft.Compute/availabilitySets",
+      "sku": {
+        "name": "Aligned"
+      },
       "name": "[Parameters('gw-availabilityset')]",
-      "location": "[resourceGroup().location]"
+      "apiVersion": "2017-12-01",
+      "location": "northeurope",
+      "tags": {},
+      "properties": {
+        "platformUpdateDomainCount": 5,
+        "platformFaultDomainCount": 2,
+        "virtualMachines": []
+      }
     },
     {
       "apiVersion": "2015-06-15",
@@ -164,11 +191,12 @@
           {
             "name": "LBFE",
             "properties": {
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpRef'))]"
+              "privateIPAllocationMethod": "Dynamic",
+                "subnet": {
+                  "id": "[variables('subnet-id')]"
+                }
               }
             }
-          }
         ],
         "backendAddressPools": [
           {
@@ -254,7 +282,7 @@
       }
     },
     {
-      "name": "[concat('gw-',copyindex(),'-nic')]",
+      "name": "[concat('Nc',parameters('vmPrefix'),0,variables('gatewayIndex'))]",
       "type": "Microsoft.Network/networkInterfaces",
       "location": "[resourceGroup().location]",
       "apiVersion": "2015-06-15",
@@ -263,7 +291,7 @@
         "count": "[parameters('numberOfWebGwInstances')]"
       },
       "dependsOn": [
-        "Microsoft.Network/loadBalancers/loadBalancer"
+        "[concat('Microsoft.Network/loadBalancers/', parameters('loadBalancer'))]"
       ],
       "properties": {
         "ipConfigurations": [
@@ -276,7 +304,7 @@
               },
               "loadBalancerBackendAddressPools": [
                 {
-                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers','loadBalancer'),'/backendAddressPools/',parameters('backendAddressPools'))]"
+                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers',Parameters('loadBalancer')),'/backendAddressPools/',parameters('backendAddressPools'))]"
                 }
               ],
               "loadBalancerInboundNatRules": []
@@ -286,28 +314,28 @@
       }
     },
     {
-      "name": "[concat('gw-vm-',copyindex())]",
+      "name": "[concat(parameters('vmPrefix'),0,variables('gatewayIndex'))]",
       "type": "Microsoft.Compute/virtualMachines",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2015-06-15",
+      "apiVersion": "[variables('vmAPI')]",
       "copy": {
         "name": "gw-vm-loop",
         "count": "[parameters('numberOfWebGwInstances')]"
       },
       "dependsOn": [
-        "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
-        "[resourceId('Microsoft.Compute/availabilitySets', 'gw-availabilityset')]",
-        "[concat('Microsoft.Network/networkInterfaces/gw-',copyindex(),'-nic')]"
+        //"[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
+        "[resourceId('Microsoft.Compute/availabilitySets', Parameters('gw-availabilityset'))]",
+        "[concat('Microsoft.Network/networkInterfaces/',concat('Nc',parameters('vmPrefix'),0,variables('gatewayIndex')))]"
       ],
       "properties": {
         "hardwareProfile": {
           "vmSize": "[parameters('vmSize')]"
         },
         "availabilitySet": {
-          "id": "[resourceId('Microsoft.Compute/availabilitySets', 'gw-availabilityset')]"
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', Parameters('gw-availabilityset'))]"
         },
         "osProfile": {
-          "computerName": "[concat('gateway',copyindex())]",
+          "computerName": "[concat(parameters('vmPrefix'),0,variables('gatewayIndex'))]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]"
         },
@@ -319,9 +347,9 @@
             "version": "latest"
           },
           "osDisk": {
-            "name": "osdisk",
-            "vhd": {
-              "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName')),'2016-01-01').primaryEndpoints.blob,'/vhds/gateway',copyindex(),'-osdisk.vhd')]"
+            "name": "[concat('MdO',parameters('vmPrefix'),0,variables('gatewayIndex'))]",
+            "managedDisk": {
+              "storageAccountType": "Standard_LRS"
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
@@ -330,19 +358,19 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('gw-',copyindex(),'-nic'))]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('Nc',parameters('vmPrefix'),0,variables('gatewayIndex')))]"
             }
           ]
         }
       },
       "resources": [
         {
-          "name": "[concat('gw-vm-',copyindex(),'/Gateway')]",
+          "name": "[concat(parameters('vmPrefix'),0,variables('gatewayIndex'),'/Gateway')]",
           "type": "Microsoft.Compute/virtualMachines/extensions",
           "location": "[resourceGroup().location]",
           "apiVersion": "2015-06-15",
           "dependsOn": [
-            "[resourceId('Microsoft.Compute/virtualMachines', Concat('gw-vm-',copyindex()))]"
+            "[resourceId('Microsoft.Compute/virtualMachines', concat(parameters('vmPrefix'),0,variables('gatewayIndex')))]"
           ],
           "properties": {
             "publisher": "Microsoft.Powershell",
@@ -368,13 +396,13 @@
           }
         },
         {
-          "name": "[concat('gw-vm-',copyindex(),'/WebAndGwFarmAdd_PostConfig1.1')]",
+          "name": "[concat(parameters('vmPrefix'),0,variables('gatewayIndex'),'/WebAndGwFarmAdd_PostConfig1.1')]",
           "type": "Microsoft.Compute/virtualMachines/extensions",
           "location": "[resourceGroup().location]",
           "apiVersion": "2015-06-15",
           "dependsOn": [
-            "[resourceId('Microsoft.Compute/virtualMachines', Concat('gw-vm-',copyindex()))]",
-            "[concat('Microsoft.Compute/virtualMachines/gw-vm-',copyindex(),'/extensions/','Gateway')]"
+            "[resourceId('Microsoft.Compute/virtualMachines', concat(parameters('vmPrefix'),0,variables('gatewayIndex')))]",
+            "[concat('Microsoft.Compute/virtualMachines/',concat(parameters('vmPrefix'),0,variables('gatewayIndex'),'/extensions/','Gateway'))]"
           ],
           "properties": {
             "publisher": "Microsoft.Compute",
@@ -390,7 +418,7 @@
               "Items": {
                 "AdminPassword": "[parameters('adminPassword')]"
               },
-              "storageAccountName": "[parameters('storageaccountname')]",
+              //"storageAccountName": "[parameters('storageaccountname')]",
               "commandToExecute": "[Concat('powershell.exe -ExecutionPolicy Unrestricted -File', ' ', 'WebAndGwFarmAdd_PostConfig1.1.ps1',' ','-username \"',parameters('adminusername'),'\" ', '-password \"',parameters('adminpassword'),'\" ','-BrokerServer \"',parameters('BrokerServer'),'\" ','-WebURL \"',parameters('WebURL'),'\" ','-Domainname \"',parameters('adDomainName'),'\" ','-DomainNetbios \"',parameters('DomainNetbios'),'\" ','-numberofwebServers ',parameters('numberOfWebGwInstances'))]"
             }
           }

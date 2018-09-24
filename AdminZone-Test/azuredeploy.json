@@ -133,7 +133,7 @@
     },
     "numberOfWebGwInstances": {
       "type": "int",
-      "defaultValue": 2,
+      "defaultValue": 1,
       "metadata": {
         "description": "Number of RD Gateway instances"
       }
@@ -180,9 +180,9 @@
     }
   },
   "variables": {
-    "rds-without-existingAD-uri": "https://raw.githubusercontent.com/itsmine1986/RDS-HA/master/rg.rds.ha.existing-ad/azuredeploy.json",
-    "rds-ha-gateway-uri": "https://raw.githubusercontent.com/itsmine1986/RDS-HA/master/rg.rds.ha.gateway/azuredeploy.json",
-    "rds-ha-broker-uri": "https://raw.githubusercontent.com/itsmine1986/RDS-HA/master/rg.rds.ha.broker/azuredeploy.json",
+    "rds-without-existingAD-uri": "https://raw.githubusercontent.com/itsmine1986/AdminZone-Test/master/SessionHost/azuredeploy.json",
+    "rds-ha-gateway-uri": "https://raw.githubusercontent.com/itsmine1986/AdminZone-Test/master/GatewayHost/azuredeploy.json",
+    "rds-ha-broker-uri": "https://raw.githubusercontent.com/itsmine1986/AdminZone-Test/master/BrokerHost/azuredeploy.json",
     "rds-ha-gateway-availablilitySet-name": "AsTRdgwh01",
     "rds-ha-gateway-fqdn-internal-name": "concat('VmWPRdgwh.',parameters(adDomainName))",
     "rds-ha-gateway-fqdn-external-name": "[concat('gw','rdshademo1','.',parameters('location'),'.cloudapp.azure.com')]",
@@ -362,6 +362,12 @@
             "metadata": {
               "description": "The name of the DNS Server to add the DNS entry to for the Connection Broker Names"
             }
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
           },
           "existingAdminPassword": {
             "type": "securestring",

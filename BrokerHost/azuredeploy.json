@@ -11,7 +11,7 @@
     },
     "dnsServer": {
       "type": "string",
-      "defaultValue": "addc-01",
+      "defaultValue": "VmWTRdsAd01",
       "metadata": {
         "description": "The name of the DNS Server to add the DNS entry to for the Connection Broker Names"
       }
@@ -24,21 +24,21 @@
     },
     "existingAdminUsername": {
       "type": "string",
-      "defaultValue": "cloudAdmin",
+      "defaultValue": "ssubramanian",
       "metadata": {
         "description": "Name of domain user account with administrative priveledges to manage RDS deployment"
       }
     },
     "existingBrokerAvailabilitySet": {
       "type": "string",
-      "defaultValue": "cb-availabilityset",
+      "defaultValue": "AsSBpamA02",
       "metadata": {
         "description": "Availability set for RD Connection Brokers"
       }
     },
     "existingBrokerHostname": {
       "type": "string",
-      "defaultValue": "rdcb-01",
+      "defaultValue": "VmWSBpamA02",
       "metadata": {
         "description": "The host name of the existing Connection Broker vm"
       }
@@ -51,14 +51,28 @@
     },
     "existingSubnetName": {
       "type": "string",
-      "defaultValue": "Subnet",
+      "defaultValue": "default",
       "metadata": {
         "description": "Subnet name"
       }
     },
     "existingVnetName": {
       "type": "string",
-      "defaultValue": "vnet",
+      "defaultValue": "VnAdminZone",
+      "metadata": {
+        "description": "Virtual network name"
+      }
+    },
+    "existingVnetRGName": {
+      "type": "string",
+      "defaultValue": "RgAdminZone",
+      "metadata": {
+        "description": "Virtual network name"
+      }
+    },
+    "RdsSubnetName": {
+      "type": "string",
+      "defaultValue": "RDSSubnet",
       "metadata": {
         "description": "Virtual network name"
       }
@@ -69,13 +83,13 @@
         "description": "Specifies the database primary connection string. The database connection string supports both high availability configurations: -- Dedicated database server. Uses Windows Authentication to connect to the databse. -- Shared database server. Uses database authentication (such as SQL authentication) with a user name and password to connect to the database."
       }
     },
-    "sqlServer": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "The name of the SQL server that the database is located on (only required for the Dedicated database server case w/Windows Auth)"
-      }
-    },
+    //"sqlServer": {
+    //  "type": "string",
+    //  "defaultValue": "",
+    //  "metadata": {
+    //    "description": "The name of the SQL server that the database is located on (only required for the Dedicated database server case w/Windows Auth)"
+    //  }
+    //},
     "windowsServerVersion": {
       "type": "string",
       "allowedValues": [
@@ -87,21 +101,32 @@
       },
       "defaultValue": "2016-Datacenter"
     },
-    "_artifactsLocation": {
+    "artifactsLocation": {
       "type": "string",
       "metadata": {
         "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
       },
       "defaultValue": "https://raw.githubusercontent.com/Azure/AzureStack-QuickStart-Templates/master/rds-deployment-ha-broker/"
+    },
+    "numberOfGatewayInstances": {
+      "type": "int",
+      "defaultValue": 2,
+      "metadata": {
+        "description": "Number of RemoteDesktopSessionHosts"
+      }
+    },
+    "vmPrefix": {
+      "type": "string"
     }
   },
   "variables": {
-    "brokerVmName": "[concat(variables('vmPrefix'), 'rdcb-02')]",
-    "brokerNicName": "[concat(variables('brokerVmName'), '-nic')]",
-    "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'rdsstorage2')]",
-    "storageAccountType": "Standard_LRS",
+    "ad-subnet-id": "[concat(resourceId(parameters('existingVnetRGName'),'Microsoft.Network/virtualNetworks',parameters('existingVnetName')),'/subnets/',parameters('existingSubnetName'))]",
+    "rds-subnet-id": "[concat(resourceId(parameters('existingVnetRGName'),'Microsoft.Network/virtualNetworks',parameters('existingVnetName')),'/subnets/',parameters('rdsSubnetName'))]",
+    "brokerIndex": "[add(parameters('numberOfGatewayInstances'), 2)]",
+  //"storageAccountName": "[concat(uniquestring(resourceGroup().id), 'hardcbpam')]",
+  //"storageAccountType": "Standard_LRS",
     "sqlClientUrl": "http://go.microsoft.com/fwlink/?LinkID=239648&clcid=0x409",
-    "vmPrefix": "",
+    //"vmPrefix": "",
     "p": {
       "broker": "[concat(' -existingBroker ', parameters('existingBrokerHostname'))]",
       "connstr": "[concat(' -primaryDbConnectionString \"', parameters('primaryDbConnectionString'), '\"')]",
@@ -111,26 +136,27 @@
       "can": "[concat(' -clientAccessName \"', parameters('clientAccessName'), '\"')]",
       "sqlnclient": "[concat(' -sqlClientUrl \"', variables('sqlClientUrl'), '\"')]",
       "dnsserver": "[concat(' -dnsServer ', parameters('dnsServer'))]",
-      "sqlserver": "[concat(' -sqlServer \"', parameters('sqlServer'), '\"')]"
+      //"sqlserver": "[concat(' -sqlServer \"', parameters('sqlServer'), '\"')]"
     },
-    "scriptParameters": "[concat(variables('p').broker, variables('p').connstr, variables('p').domain, variables('p').user, variables('p').pwd, variables('p').can, variables('p').sqlnclient, variables('p').dnsserver, variables('p').sqlserver)]",
-    "scriptLocation": "[concat(parameters('_artifactsLocation'), '/Scripts')]",
+    //"scriptParameters": "[concat(variables('p').broker, variables('p').connstr, variables('p').domain, variables('p').user, variables('p').pwd, variables('p').can, variables('p').sqlnclient, variables('p').dnsserver, variables('p').sqlserver)]",
+    "scriptParameters": "[concat(variables('p').broker, variables('p').connstr, variables('p').domain, variables('p').user, variables('p').pwd, variables('p').can, variables('p').sqlnclient, variables('p').dnsserver)]",
+    "scriptLocation": "[concat(parameters('artifactsLocation'), '/Scripts')]",
     "scriptFileName": "RdcbHaPostConfig.ps1"
   },
   "resources": [
-    {
-      "apiVersion": "2015-06-15",
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('storageAccountName')]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "accountType": "[variables('storageAccountType')]"
-      }
-    },
+    //{
+    //  "apiVersion": "2015-06-15",
+    //  "type": "Microsoft.Storage/storageAccounts",
+    //  "name": "[variables('storageAccountName')]",
+    //  "location": "[resourceGroup().location]",
+    //  "properties": {
+    //    "accountType": "[variables('storageAccountType')]"
+    //  }
+    //},
     {
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/networkInterfaces",
-      "name": "[variables('brokerNicName')]",
+      "name": "[concat('Nc',parameters('vmPrefix'),0,variables('brokerIndex'))]",
       "location": "[resourceGroup().location]",
       "dependsOn": [],
       "properties": {
@@ -140,7 +166,7 @@
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('existingVnetName'), parameters('existingSubnetName'))]"
+                "id": "[variables('rds-subnet-id')]"
               }
             }
           }
@@ -148,13 +174,12 @@
       }
     },
     {
-      "apiVersion": "2015-06-15",
+      "apiVersion": "2017-03-30",
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[variables('brokerVmName')]",
+      "name": "[concat(parameters('vmPrefix'),0,variables('brokerIndex'))]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
-        "[concat('Microsoft.Network/networkInterfaces/', variables('brokerNicName'))]"
+        "[concat('Nc',parameters('vmPrefix'),0,variables('brokerIndex'))]"
       ],
       "properties": {
         "hardwareProfile": {
@@ -164,7 +189,7 @@
           "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('existingBrokerAvailabilitySet'))]"
         },
         "osProfile": {
-          "computerName": "[variables('brokerVmName')]",
+          "computerName": "[concat(parameters('vmPrefix'),0,variables('brokerIndex'))]",
           "adminUsername": "[parameters('existingAdminUsername')]",
           "adminPassword": "[parameters('existingAdminPassword')]"
         },
@@ -176,9 +201,9 @@
             "version": "latest"
           },
           "osDisk": {
-            "name": "osdisk",
-            "vhd": {
-              "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName')),'2016-01-01').primaryEndpoints.blob,'vhds/',variables('brokerVmName'),'-osdisk.vhd')]"
+            "name": "[concat('MdO',parameters('vmPrefix'),0,variables('brokerIndex'))]",
+            "managedDisk": {
+              "storageAccountType": "Standard_LRS"
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
@@ -187,7 +212,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('brokerNicName'))]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('Nc',parameters('vmPrefix'),0,variables('brokerIndex')))]"
             }
           ]
         }
@@ -196,10 +221,10 @@
     {
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(variables('brokerVmName'),'/configuration')]",
+      "name": "[concat(concat(parameters('vmPrefix'),0,variables('brokerIndex')),'/configuration')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[resourceId('Microsoft.Compute/virtualMachines',variables('brokerVmName'))]"
+        "[resourceId('Microsoft.Compute/virtualMachines',concat(parameters('vmPrefix'),0,variables('brokerIndex')))]"
       ],
       "properties": {
         "publisher": "Microsoft.Powershell",
@@ -207,7 +232,7 @@
         "typeHandlerVersion": "2.75",
         "autoUpgradeMinorVersion": true,
         "settings": {
-          "modulesUrl": "[concat(parameters('_artifactsLocation'),'/DSC/Configuration.zip')]",
+          "modulesUrl": "[concat(parameters('artifactsLocation'),'/DSC/Configuration.zip')]",
           "configurationFunction": "Configuration.ps1\\DomainJoin",
           "properties": {
             "domainName": "[parameters('existingDomainName')]",
@@ -223,29 +248,29 @@
           }
         }
       }
-    },
-    {
-      "apiVersion": "2015-06-15",
-      "name": "[concat(variables('brokerVmName'),'/ha-broker-configuration')]",
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('brokerVmName'),'/extensions/','configuration')]"
-      ],
-      "properties": {
-        "publisher": "Microsoft.Compute",
-        "type": "CustomScriptExtension",
-        "typeHandlerVersion": "1.8",
-        "autoUpgradeMinorVersion": true,
-        "settings": {
-          "fileUris": [
-            "[concat(variables('scriptLocation'), '/', variables('scriptFileName'))]"
-          ]
-        },
-        "protectedSettings": {
-          "commandToExecute": "[concat( 'powershell -noninteractive -executionpolicy bypass -file ', variables('scriptFileName'), variables('scriptParameters'), ' >> script.log 2>&1' )]"
-        }
-      }
     }
+    //{
+    //  "apiVersion": "2015-06-15",
+    //  "name": "[concat(parameters('vmPrefix'),0,variables('brokerIndex'),'/ha-broker-configuration')]",
+    //  "type": "Microsoft.Compute/virtualMachines/extensions",
+    //  "location": "[resourceGroup().location]",
+    //  "dependsOn": [
+    //    "[concat('Microsoft.Compute/virtualMachines/', parameters('vmPrefix'),0,variables('brokerIndex'),'/extensions/','configuration')]"
+    //  ],
+    //  "properties": {
+    //    "publisher": "Microsoft.Compute",
+    //    "type": "CustomScriptExtension",
+    //    "typeHandlerVersion": "1.8",
+    //    "autoUpgradeMinorVersion": true,
+    //    "settings": {
+    //      "fileUris": [
+    //        "[concat(variables('scriptLocation'), '/', variables('scriptFileName'))]"
+    //      ]
+    //    },
+    //    "protectedSettings": {
+    //      "commandToExecute": "[concat( 'powershell -noninteractive -executionpolicy bypass -file ', variables('scriptFileName'), variables('scriptParameters'), ' >> script.log 2>&1' )]"
+    //    }
+    //  }
+    //}
   ]
 }
