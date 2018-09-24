@@ -106,7 +106,7 @@
       "metadata": {
         "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
       },
-      "defaultValue": "https://raw.githubusercontent.com/Azure/AzureStack-QuickStart-Templates/master/rds-deployment-ha-broker/"
+      "defaultValue": "https://satbpamae7qam4m35g4n4.blob.core.windows.net/dscarm/"
     },
     "numberOfGatewayInstances": {
       "type": "int",
@@ -123,25 +123,25 @@
     "ad-subnet-id": "[concat(resourceId(parameters('existingVnetRGName'),'Microsoft.Network/virtualNetworks',parameters('existingVnetName')),'/subnets/',parameters('existingSubnetName'))]",
     "rds-subnet-id": "[concat(resourceId(parameters('existingVnetRGName'),'Microsoft.Network/virtualNetworks',parameters('existingVnetName')),'/subnets/',parameters('rdsSubnetName'))]",
     "brokerIndex": "[add(parameters('numberOfGatewayInstances'), 2)]",
-  //"storageAccountName": "[concat(uniquestring(resourceGroup().id), 'hardcbpam')]",
-  //"storageAccountType": "Standard_LRS",
-    "sqlClientUrl": "http://go.microsoft.com/fwlink/?LinkID=239648&clcid=0x409",
+    //"storageAccountName": "[concat(uniquestring(resourceGroup().id), 'hardcbpam')]",
+    //"storageAccountType": "Standard_LRS",
+    //"sqlClientUrl": "http://go.microsoft.com/fwlink/?LinkID=239648&clcid=0x409",
     //"vmPrefix": "",
     "p": {
-      "broker": "[concat(' -existingBroker ', parameters('existingBrokerHostname'))]",
-      "connstr": "[concat(' -primaryDbConnectionString \"', parameters('primaryDbConnectionString'), '\"')]",
-      "domain": "[concat(' -domainName ', parameters('existingDomainName'))]",
-      "user": "[concat(' -username ', parameters('existingAdminUsername'))]",
-      "pwd": "[concat(' -password ', parameters('existingAdminPassword'))]",
-      "can": "[concat(' -clientAccessName \"', parameters('clientAccessName'), '\"')]",
-      "sqlnclient": "[concat(' -sqlClientUrl \"', variables('sqlClientUrl'), '\"')]",
-      "dnsserver": "[concat(' -dnsServer ', parameters('dnsServer'))]",
+      //"broker": "[concat(' -existingBroker ', parameters('existingBrokerHostname'))]",
+      //"connstr": "[concat(' -primaryDbConnectionString \"', parameters('primaryDbConnectionString'), '\"')]",
+      //"domain": "[concat(' -domainName ', parameters('existingDomainName'))]",
+      //"user": "[concat(' -username ', parameters('existingAdminUsername'))]",
+      //"pwd": "[concat(' -password ', parameters('existingAdminPassword'))]",
+      //"can": "[concat(' -clientAccessName \"', parameters('clientAccessName'), '\"')]",
+      //"sqlnclient": "[concat(' -sqlClientUrl \"', variables('sqlClientUrl'), '\"')]",
+      //"dnsserver": "[concat(' -dnsServer ', parameters('dnsServer'))]",
       //"sqlserver": "[concat(' -sqlServer \"', parameters('sqlServer'), '\"')]"
     },
     //"scriptParameters": "[concat(variables('p').broker, variables('p').connstr, variables('p').domain, variables('p').user, variables('p').pwd, variables('p').can, variables('p').sqlnclient, variables('p').dnsserver, variables('p').sqlserver)]",
-    "scriptParameters": "[concat(variables('p').broker, variables('p').connstr, variables('p').domain, variables('p').user, variables('p').pwd, variables('p').can, variables('p').sqlnclient, variables('p').dnsserver)]",
-    "scriptLocation": "[concat(parameters('artifactsLocation'), '/Scripts')]",
-    "scriptFileName": "RdcbHaPostConfig.ps1"
+    //"scriptParameters": "[concat(variables('p').broker, variables('p').connstr, variables('p').domain, variables('p').user, variables('p').pwd, variables('p').can, variables('p').sqlnclient, variables('p').dnsserver)]",
+    //"scriptLocation": "[concat(parameters('artifactsLocation'), '/Scripts')]",
+    //"scriptFileName": "RdcbHaPostConfig.ps1"
   },
   "resources": [
     //{
@@ -232,7 +232,7 @@
         "typeHandlerVersion": "2.75",
         "autoUpgradeMinorVersion": true,
         "settings": {
-          "modulesUrl": "[concat(parameters('artifactsLocation'),'/DSC/Configuration.zip')]",
+          "modulesUrl": "[concat(parameters('artifactsLocation'),'/Configuration.zip')]",
           "configurationFunction": "Configuration.ps1\\DomainJoin",
           "properties": {
             "domainName": "[parameters('existingDomainName')]",

@@ -13,7 +13,7 @@
       "metadata": {
         "description": "The Loadbalancer name must match from the RDS deployment. And default value taken by template is loadbalancer."
       },
-      "defaultValue": "loadBalancer"
+      "defaultValue": "LbISBpamA01"
     },
     "backendAddressPools": {
       "type": "string",
@@ -24,7 +24,7 @@
     },
     "gw-AvailabilitySet": {
       "type": "string",
-      "defaultValue": "gw-availabilityset",
+      "defaultValue": "AsSBpamA01",
       "metadata": {
         "description": "The gw-availabilityset name must match from the RDS deployment. And default value taken by template is gw-availabilityset."
       }
@@ -136,7 +136,8 @@
     "dnsServerPrivateIp": "10.40.0.4",
     "subnet-id": "[concat(resourceId(parameters('adVnetRG'),'Microsoft.Network/virtualNetworks',parameters('adVnetName')),'/subnets/',parameters('rdsSubnetName'))]",
     "publicIpRef": "PiPEu2AddS",
-    "assetLocation": "https://raw.githubusercontent.com/Azure/AzureStack-QuickStart-Templates/master/rds-deployment",
+    //"assetLocation": "https://raw.githubusercontent.com/Azure/AzureStack-QuickStart-Templates/master/rds-deployment",
+    "assetLocation": "https://satbpamae7qam4m35g4n4.blob.core.windows.net/dscarm/",
     "vmAPI": "2017-03-30",
     "PublicIPLocation": "[concat(parameters('dnsLabelPrefix'),'.','[resourceGroup().location]','.cloudapp.azure.com')]",
     "gatewayIndex": 2
@@ -411,7 +412,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "https://raw.githubusercontent.com/Azure/AzureStack-QuickStart-Templates/master/rds-deployment-ha-gateway/Scripts/WebAndGwFarmAdd_PostConfig1.1.ps1"
+                "https://satbpamae7qam4m35g4n4.blob.core.windows.net/dscarm/WebAndGwFarmAdd_PostConfig1.1.ps1",
               ]
             },
             "protectedSettings": {
